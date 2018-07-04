@@ -1,5 +1,7 @@
 package com.wanq.wechat.mp.controller;
 
+import com.wanq.wechat.mp.util.JsonUtils;
+import me.chanjar.weixin.common.util.crypto.SHA1;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -36,7 +38,12 @@ public class WechatController {
         if (StringUtils.isAnyBlank(signature, timestamp, nonce, echostr)) {
             throw new IllegalArgumentException("请求参数非法，请核实!");
         }
-        this.logger.info("\nTOKEN：{}", this.wxService.getWxMpConfigStorage().getToken());
+
+        String signa = SHA1.gen(this.wxService.getWxMpConfigStorage().getToken(), timestamp, nonce);
+
+//        this.logger.info("\nUser：{}", JsonUtils.toJson(this.wxService.getWxMpConfigStorage()));
+//        this.logger.info("\n检查：{}, {}, {}", this.wxService.getWxMpConfigStorage().getToken(), signa, signature);
+
         if (this.wxService.checkSignature(timestamp, nonce, signature)) {
             return echostr;
         }
